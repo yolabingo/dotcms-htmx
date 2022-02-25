@@ -5,12 +5,13 @@ Using dotCMS to manage
 
 ## Running DotCMS with demo site content
 
-tl;dr;
+**tl;dr;**
+
 On current OS X with Docker Desktop
 ```
 curl -o docker-compose.yml https://raw.githubusercontent.com/dotCMS/core/master/docker/docker-compose-examples/single-node-demo-site/docker-compose.yml
 docker compose up -d 
-'''
+```
 browse to 
 
 [http://localhost:8080](http://localhost:8080/dotAdmin/) or 
