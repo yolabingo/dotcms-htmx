@@ -17,7 +17,7 @@ Install and run [Docker Desktop](https://www.docker.com/products/docker-desktop)
 In Docker Desktop -> Preferences -> Resources -> Advanced -> increase Memory to at least 6G
 
 Open `Terminal` application and run:
-```
+```sh
 curl -o docker-compose.yml https://raw.githubusercontent.com/dotCMS/core/master/docker/docker-compose-examples/single-node-demo-site/docker-compose.yml
 docker compose up -d 
 docker ps
