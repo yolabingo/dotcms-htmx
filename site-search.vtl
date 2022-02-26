@@ -8,24 +8,6 @@
     #set($qUrl = "q=$!{q}")
 #end
 
-#if ($UtilMethods.isSet($request.getParameter("mimeType")))
-    #set($mimeType = $request.getParameter("mimeType"))
-    #set($mimeTypeUrl = "mimeType=$!{mimeType}")
-    #set($_dummy = $urlList.add("mimeType=$!{mimeType}"))
-#end
-
-#if ($UtilMethods.isSet($request.getParameter("keyword")))
-    #set($keyword = $request.getParameter("keyword"))
-    #set($keywordUrl = "keyword=$!{keyword}")
-    #set($_dummy = $urlList.add("keyword=$!{keyword}"))
-#end
-
-#if ($UtilMethods.isSet($request.getParameter("modifiedOn")))
-    #set($modifiedOn = $request.getParameter("modifiedOn"))
-    #set($modifiedOnUrl = "modifiedOn=$!{modifiedOn}")
-    #set($_dummy = $urlList.add("modifiedOn=$!{modifiedOn}"))
-#end
-
 #set($show = 10)
 #set($page = $request.getParameter("p"))
 #if(! $UtilMethods.isSet($page))
@@ -84,46 +66,7 @@
     #if($intPages < $numberOfPages)
         #set($numberOfPages = $math.add($intPages, 1))
     #end
-
-
-## AGGREGATIONS ==========
-## if there are quotes, we need to escape them
-## for an aggregation query
-    #if($runQ.contains('"'))
-        #set($runQ = $runQ.replaceAll("\"", "\\\""))
-    #end
-
-    #set($mimeAggregationsQry = '{
-        "query" : { "query_string" : {"query" : "$runQ"} },
-        "aggs" : {
-            "mimeType" : { "terms" : {"field" : "mimeType"} }
-         }
-        }')
-
-        #set($mimeAggregationsQry = $render.eval($context, $mimeAggregationsQry ))
-        #set($mimeAggregations = $sitesearch.getAggregations($indexToSearch, $mimeAggregationsQry))
-
-        #set($dateAggregations = '{
-        "query" : { "query_string" : {"query" : "$runQ"} },
-        "aggs" : {
-            "modified" : { "date_histogram" : {"field" : "modified","interval" : "month","order": {"_key": "desc"} }}
-        }
-    }')
-
-        #set($dateAggregations = $render.eval($context, $dateAggregations ))
-        #set($dateAggregations = $sitesearch.getAggregations($indexToSearch, $dateAggregations))
-
-    ##Keywords Aggregation
-        #set($kwAggregationsQry = '  {
-        "query" : { "query_string" : {"query" : "$runQ"} },
-        "aggs" : {
-            "keywords" : { "terms" : { "field" : "keywords", "size" : 10 } }
-        }
-    }')
-
-        #set($kwAggregationsQry = $render.eval($context,$kwAggregationsQry))
-        #set($kwAggregations = $sitesearch.getAggregations($indexToSearch, $kwAggregationsQry))
-    #end
+#end
 
 #if($searchresults.results.size() > 0)
     <p class="results-info">We found <b>$searchresults.results.size()</b> results in your search</p>
