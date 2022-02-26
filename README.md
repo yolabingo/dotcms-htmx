@@ -14,7 +14,7 @@ On current OS X:
 
 Install and run [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
-In Docker Desktop Preferences -> Resources -> Advanced -> increase Memory to at least 6G
+In Docker Desktop -> Preferences -> Resources -> Advanced -> increase Memory to at least 6G
 
 Open `Terminal` application and run:
 ```
@@ -40,7 +40,7 @@ username: admin@dotcms.com
 password admin
 ```
 
-Open a different browser or incognito window and browse to the Search page
+Open a different browser or incognito window and browse to the Search page - search results won't work until you create a Site Search index.
 
 [http://localhost:8080/search/](http://localhost:8080/search/) 
 
@@ -66,14 +66,25 @@ The "View All Jobs" tab shows the progress. It should take only a couple minutes
 
 Once complete, the "Indices" tab should show a healthy index.
 
-## Add HTMX script to footer
+### Note the query strings used by static search page
+In the front-end browser, search for "ski"
 
+You should see search results. Note the uri for the first page of results:
+
+`/search/index?q=ski&search=Search`
+
+Scroll down and click **2** for the next page of results and note the uri ads `&p=` for the pages which are zero-indexed:
+
+`/search/index?q=ski&p=1`
+[http://localhost:8080/search/index?q=ski&p=1](http://localhost:8080/search/index?q=ski&p=1) 
+
+## Add HTMX javascript to Theme footer
 In the back-end go to:
 
 `Site -> Browser -> application -> themes -> travel`
 
 Double-click `footer.vtl` - scroll to the bottom of file editor and add HTMX to the Javascript section:
-```
+```html
 <!-- Javascript-->
 <script src="${dotTheme.path}js/core.min.js"></script>
 <script src="${dotTheme.path}js/script.js"></script>
@@ -118,7 +129,7 @@ We're going to refactor this code so peruse it.
 
 ### Remove the aggregations-related code from site-search.vtl
 
-To simplify the vtl for this example, remove three blocks of code related to aggregations. This could be re-added later.
+To simplify the VTL for this example, remove the three blocks of code related to aggregations.
 
 The result is [/2-remove-search-aggregations/site-search.vtl](https://github.com/yolabingo/dotcms-htmx/blob/2-remove-search-aggregations/site-search.vtl)
 
