@@ -8,24 +8,6 @@
     #set($qUrl = "q=$!{q}")
 #end
 
-#if ($UtilMethods.isSet($request.getParameter("mimeType")))
-    #set($mimeType = $request.getParameter("mimeType"))
-    #set($mimeTypeUrl = "mimeType=$!{mimeType}")
-    #set($_dummy = $urlList.add("mimeType=$!{mimeType}"))
-#end
-
-#if ($UtilMethods.isSet($request.getParameter("keyword")))
-    #set($keyword = $request.getParameter("keyword"))
-    #set($keywordUrl = "keyword=$!{keyword}")
-    #set($_dummy = $urlList.add("keyword=$!{keyword}"))
-#end
-
-#if ($UtilMethods.isSet($request.getParameter("modifiedOn")))
-    #set($modifiedOn = $request.getParameter("modifiedOn"))
-    #set($modifiedOnUrl = "modifiedOn=$!{modifiedOn}")
-    #set($_dummy = $urlList.add("modifiedOn=$!{modifiedOn}"))
-#end
-
 #set($show = 10)
 #set($page = $request.getParameter("p"))
 #if(! $UtilMethods.isSet($page))
@@ -83,46 +65,6 @@
     #set($intPages = $math.toInteger($numberOfPages))
     #if($intPages < $numberOfPages)
         #set($numberOfPages = $math.add($intPages, 1))
-    #end
-
-
-## AGGREGATIONS ==========
-## if there are quotes, we need to escape them
-## for an aggregation query
-    #if($runQ.contains('"'))
-        #set($runQ = $runQ.replaceAll("\"", "\\\""))
-    #end
-
-    #set($mimeAggregationsQry = '{
-        "query" : { "query_string" : {"query" : "$runQ"} },
-        "aggs" : {
-            "mimeType" : { "terms" : {"field" : "mimeType"} }
-         }
-        }')
-
-        #set($mimeAggregationsQry = $render.eval($context, $mimeAggregationsQry ))
-        #set($mimeAggregations = $sitesearch.getAggregations($indexToSearch, $mimeAggregationsQry))
-
-        #set($dateAggregations = '{
-        "query" : { "query_string" : {"query" : "$runQ"} },
-        "aggs" : {
-            "modified" : { "date_histogram" : {"field" : "modified","interval" : "month","order": {"_key": "desc"} }}
-        }
-    }')
-
-        #set($dateAggregations = $render.eval($context, $dateAggregations ))
-        #set($dateAggregations = $sitesearch.getAggregations($indexToSearch, $dateAggregations))
-
-    ##Keywords Aggregation
-        #set($kwAggregationsQry = '  {
-        "query" : { "query_string" : {"query" : "$runQ"} },
-        "aggs" : {
-            "keywords" : { "terms" : { "field" : "keywords", "size" : 10 } }
-        }
-    }')
-
-        #set($kwAggregationsQry = $render.eval($context,$kwAggregationsQry))
-        #set($kwAggregations = $sitesearch.getAggregations($indexToSearch, $kwAggregationsQry))
     #end
 
 #if($searchresults.results.size() > 0)
@@ -191,105 +133,6 @@
                 </div>
             #end
 
-        </div>
-
-        <div class="col-sm-3">
-            #set($mimeAggregationsUrl = "")
-            #foreach($url in $urlList)
-                #if (!$url.contains('mimeType'))
-                    #set($mimeAggregationsUrl = "$!{mimeAggregationsUrl}&$!{url}")
-                #end
-            #end
-            #if ($UtilMethods.isSet($mimeAggregations) && $mimeAggregations.size() > 0)
-                #foreach($aggregation in $mimeAggregations.entrySet())
-                    #if(!$UtilMethods.isSet($aggregation.value.buckets) || $aggregation.value.buckets.size() == 0)
-                        <div class="alert alert-info">No Results</div>
-                    #else
-                        <h5>By Type:</h5>
-                        <div class="list-group">
-                            #foreach($term in $aggregation.value.buckets)
-                                #set($strStart = $term.key.indexOf("/") +1)
-                                #set($strEnd = $term.key.length())
-                                #set($termTerm  = $term.key.substring($strStart, $strEnd))
-                                #if($termTerm.contains("document"))
-                                #set($termTerm = "document")
-                                #end
-                                #if($UtilMethods.isSet($mimeType))
-                                    <a class="list-group-item active" href="?q=$!{q}$!{mimeAggregationsUrl}"><i class="glyphicon glyphicon-remove clear-icon"></i> $termTerm</a>
-                                #else
-                                    <a href="?q=$!{q}$!{mimeAggregationsUrl}&mimeType=$term.key" class="list-group-item">
-                                        $termTerm
-                                        <span class="badge">$term.docCount</span>
-                                    </a>
-                                #end
-                            #end
-                        </div>
-                    #end
-                #end
-            #end
-
-            #if ($dateAggregations)
-                #set($dateAggregationsUrl = "")
-                #foreach($url in $urlList)
-                    #if (!$url.contains('modifiedOn'))
-                        #set($dateAggregationsUrl = "$!{dateAggregationsUrl}&$!{url}")
-                    #end
-                #end
-                #foreach($aggregation in $dateAggregations.entrySet())
-                    #if(!$UtilMethods.isSet($aggregation.value.buckets) || $aggregation.value.buckets.size() == 0)
-                        <div class="alert alert-info">No Results</div>
-                    #else
-                        <h5>Month Modified:</h5>
-                        <div class="list-group">
-                            #set($startDate = $date.getDate())
-                            #foreach($t in $aggregation.value.buckets)
-                                #if($t.docCount > 0)
-                                    #set($x = $date.getDate())
-                                    ${x.setTime($t.key.millis)}
-                                    #set($nextDay = $date.getDate())
-                                    $nextDay.setTime($math.add($x.time, 86400000))
-                                    #if($UtilMethods.isSet($modifiedOn))
-                                        <a class="list-group-item active" href="?q=$!{q}$!{dateAggregationsUrl}"><i class="glyphicon glyphicon-remove clear-icon"></i>$date.format('MMM Y', $nextDay)</a>
-                                    #else
-                                        <a href="?q=$!{q}$!{dateAggregationsUrl}&modifiedOn=[$date.format('yyyy-MM-dd', $nextDay) TO $date.format('yyyy-MM-dd', $startDate)]" class="list-group-item">
-                                            $date.format('MMM Y', $nextDay)
-                                            <span class="badge">$t.docCount</span>
-                                        </a>
-                                    #end
-                                    #set($startDate = $x)
-                                #end
-                            #end
-                        </div>
-                    #end
-                #end
-            #end
-
-            #if($UtilMethods.isSet($kwAggregations) && $kwAggregations.size() > 0)
-                #set($keywordUrl = "")
-                #foreach($url in $urlList)
-                    #if (!$url.contains('keyword'))
-                        #set($keywordUrl = "$!{keywordUrl}&$!{url}")
-                    #end
-                #end
-                #foreach($aggregation in $kwAggregations.entrySet())
-                    #if($aggregation.value.buckets.size() > 0)
-                        <h5>By Keyword:</h5>
-                        <div class="list-group">
-                            #foreach($term in $aggregation.value.buckets)
-                                #if($UtilMethods.isSet($term.key))
-                                    #if($UtilMethods.isSet($keyword) && $term.key == $keyword)
-                                        <a class="list-group-item active" href="?q=$!{q}$!{keywordUrl}"><i class="glyphicon glyphicon-remove clear-icon"></i>$term.key</a>
-                                    #else
-                                        <a href="?q=$!{q}$!{keywordUrl}&keyword=$term.key" class="list-group-item #if($keyword == $term.key)active#end">$term.key <span class="badge">$term.docCount</span></a>
-                                    #end
-                                #end
-                            #end
-                        </div>
-                    #end
-                #end
-            #else
-                <div class="alert alert-info">No Results</div>
-            #end
         </div>
     </div>
 #else
