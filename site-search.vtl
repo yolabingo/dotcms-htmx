@@ -66,6 +66,7 @@
     #if($intPages < $numberOfPages)
         #set($numberOfPages = $math.add($intPages, 1))
     #end
+#end
 
 #if($searchresults.results.size() > 0)
     <p class="results-info">We found <b>$searchresults.results.size()</b> results in your search</p>
