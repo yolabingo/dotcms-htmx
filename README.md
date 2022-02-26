@@ -24,7 +24,7 @@ docker ps
 ```
 You should see docker containers for DotCMS, Postgres, and Elasticsearch.
 
-### Open two browser windows - 
+### Open browsers to DotCMS front-end and back-end 
 DotCMS app is listening on two ports - either is fine, we'll use 8080.
 
 `http:  8080`
@@ -49,8 +49,11 @@ Open a different browser or incognito window and browse to the Search page
 ## Create Site Search Index
 [DotCMS Site Search Docs](https://dotcms.com/docs/latest/site-search)
 
-DotCMS requires a Site Search index to support searches from front-end sites. To create a Site Search index, log into the dotCMS backend at `/dotAdmin/`:
-Dev Tools -> Site Search -> Job Scheduler and create a job:
+DotCMS requires a Site Search index to support searches from front-end sites. 
+
+Create a Site Search index in the back-end:
+
+`Dev Tools -> Site Search -> Job Scheduler -> create a job:`
 ```
 Run = Now
 Select Sites to Index = Index All Sites
@@ -65,8 +68,9 @@ Once complete, the "Indices" tab should show a healthy index.
 
 ## Add HTMX script to footer
 
-In DotCMS backend go to
-Site -> Browser -> application -> themes -> travel
+In the back-end go to:
+
+`Site -> Browser -> application -> themes -> travel`
 
 Double-click `footer.vtl` - scroll to the bottom of file editor and add HTMX to the Javascript section:
 ```
