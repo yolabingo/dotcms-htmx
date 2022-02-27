@@ -13,7 +13,7 @@ See the [htmx Active Search](https://htmx.org/examples/active-search/) example -
 
 https://htmx.org/examples/infinite-scroll/
 
-Use two browser windows - one logged into the DotCMS backend and one not logged in.
+Use two browser windows - one logged into the DotCMS admin/back-end, and another browser not logged in to emulate site visitors.
 
 ## Running DotCMS with demo site content
 
@@ -41,22 +41,22 @@ DotCMS app is listening on two ports - either is fine, we'll use 8080.
 
 `https: 8443` - you must accept the SSL cert 
 
-Open a broweser and log in to DotCMS backend:
+Open a broweser and log in to DotCMS back-end:
 
 [http://localhost:8080/dotAdmin/](http://localhost:8080/dotAdmin/) 
 
 ```
 username: admin@dotcms.com
-password admin
+password: admin
 ```
 
-Open a different browser or incognito window and browse to the Search page - search results won't work until you create a Site Search index.
+Open a different browser or incognito window and browse to the Search page (you won't see any search results until you create a Site Search index).
 
 [http://localhost:8080/search/](http://localhost:8080/search/) 
 
- A version of this site is always publically available at [https://demo.dotcms.com](https://demo.dotcms.com) but it is refreshed multiple times/day so your changes a) will not persist and b) can be changed by others using the site.
+ A version of the demo site is always publically available at [https://demo.dotcms.com](https://demo.dotcms.com) but it is recreated multiple times/day so your changes will not persist and can be changed by others using the site.
 
-## Create Site Search Index
+## Create dotCMS Site Search Index
 [DotCMS Site Search Docs](https://dotcms.com/docs/latest/site-search)
 
 DotCMS requires a Site Search index to support searches from front-end sites. 
@@ -65,10 +65,10 @@ Create a Site Search index in the back-end:
 
 `Dev Tools -> Site Search -> Job Scheduler -> create a job:`
 ```
-Run = Now
-Select Sites to Index = Index All Sites
-Alias Name = default
-Language = English, Espanol
+Run: Now
+Select Sites to Index: Index All Sites
+Alias Name: default
+Language: English, Espanol
 ```
 Click EXECUTE 
 
@@ -77,19 +77,19 @@ The "View All Jobs" tab shows the progress. It should take only a couple minutes
 Once complete, the "Indices" tab should show a healthy index.
 
 ### Note the query strings used by static search page
-In the front-end browser, search for "ski"
+In the front-end browser, search for "ski" at [http://localhost:8080/search/](http://localhost:8080/search/) 
 
 You should see search results. Note the uri for the first page of results:
 
 `/search/index?q=ski&search=Search`
 
-Scroll down and click **2** for the next page of results and note the uri ads `&p=` for the pages which are zero-indexed:
+Scroll down and click **2** for the next page of results and note the uri adds `&p=[page_number]` for the pages (which are zero-indexed):
 
 `/search/index?q=ski&p=1`
 
 [http://localhost:8080/search/index?q=ski&p=1](http://localhost:8080/search/index?q=ski&p=1) 
 
-## Add htmx javascript to Theme footer
+## Load htmx javascript in the Theme footer
 ["Installing htmx" docs](https://htmx.org/docs/#installing)
 
 In the back-end go to:
@@ -108,27 +108,27 @@ click Publish
 
 On the front-end site,  reload and "view source" on the [/search/](http://localhost:8080/search/) page to confirm htmx is included in the footer.
 
-## Simplify static /search/ page
+## Simplify VTL in the static /search/ page
 Let's examine the behavior of the "static" search page which we are going to refactor.
 
 On [/search/](http://localhost:8080/search/) submit a search for "ski"
 
-The search results are paginated with 10 results page - scroll down to see links to the other pages.
+The search results are paginated with 10 results page - scroll down to see links to the other pages of paginated results.
 
 Also note the "By Type" and "Month Modified" search results aggregations.
 
 ### Locate the "site search" VTL code in DotCMS
 To simplify the VTL for this example, let's remove the aggregations from the results page. 
 
-How do we find this code? In the backend,
+How do we find this code? In the back-end browse to
 
-Site -> Browser -> search -> double-click "index" -> click EDIT ->
+`Site -> Browser -> search -> double-click "index" -> click EDIT ->`
 
-mouse over the "What are you looking for?" search form container -> click edit (pencil icon) ->
+`mouse over the "What are you looking for?" search form container -> click edit (pencil icon) ->`
 
-click INFO next to the site-search.vtl file to find it's location: `/application/vtl/site-search/site-search.vtl`
+`click INFO next to the site-search.vtl file` to find it's location: `/application/vtl/site-search/site-search.vtl`
 
-Close the edit modals to get back to the Site Browser and double-click to open this vtl file:
+Close the edit modals to get back to the Site Browser to open this vtl file by double-clicking the file:
 
 `application -> vtl -> site-search -> site-search.vtl`
 
@@ -139,9 +139,11 @@ Peruse the code to get a basic lay of the land.
 [Lines 128-318](https://github.com/yolabingo/dotcms-htmx/blob/e2d2dc774f2ac042048019393a68ef0306621a13/site-search.vtl#L128-L318) generate HTML including the search form, search results, and search aggregation results.
 
 ### Remove the aggregations-related code from site-search.vtl
-Just to simplify the VTL for this example, remove the three blocks of code related to aggregations.
+To simplify the VTL for this example, we will remove the three blocks of code related to aggregations.
 
-The result is [/2-remove-search-aggregations/site-search.vtl](https://github.com/yolabingo/dotcms-htmx/blob/2-remove-search-aggregations/site-search.vtl)
+Replace the current VTL code with this code: [/2-remove-search-aggregations/site-search.vtl](https://github.com/yolabingo/dotcms-htmx/blob/2-remove-search-aggregations/site-search.vtl)
+
+then click `Publish`
 
 ## Create /search/results "partial" Page
 We'll need to create a new "Page" on the site that returns "html over the wire" containing only the results of search queries - it must not include our header or footer files for "normal" HTML Pages.
@@ -161,7 +163,7 @@ Paste [this refactored version of our VTL](https://github.com/yolabingo/dotcms-h
 Once complete, click "Save and Publish"
 
 ### Create search-results Template
-Next, make a new Template that includes only this container. In the backend
+Next, make a new Template that includes only this container. In the back-end
 
 `Site -> Templates -> right-click "Blank" -> Copy -> double-click the copied "Blank - 1" -> EDIT` 
 
