@@ -21,7 +21,6 @@
 #set($offset = $math.mul($page, $show))
 #set($end = $math.mul($math.add($page,1), $show))
 
-
 #if($UtilMethods.isSet($request.getParameter("q")))
 
 ## QUERY =============
@@ -60,13 +59,12 @@
 
 ##PAGINATION VARIABLES =============
     ##set($numberOfPages = $math.div($pagedsearchresults.totalResults,$show))
-    #set($numberOfPages = $math.div($pagedsearchresults.totalHits,$show))
+   #set($numberOfPages = $math.div($pagedsearchresults.totalHits,$show))
     #set($intPages = $math.toInteger($numberOfPages))
     #if($intPages < $numberOfPages)
         #set($numberOfPages = $math.add($intPages, 1))
     #end
 #end
-
 
 #if($page == 0)
     <p class="results-info">We found <b>$totalsearchresults.results.size()</b> results in your search</p>
@@ -80,7 +78,18 @@
                 #set($i =0)
                 #foreach($result in $pagedsearchresults.results)
                 ##PRINTING EACH SEARCH RESULT
+                    #set($i =$math.add($i, 1))
+                    #if($i==$show)
+                        #set($nextpage = $math.add($page,1))
+                        #if ($nextpage < $numberOfPages)
+                          ##HTMX - FETCH NEXT PAGE IF THERE IS ONE
+                <li hx-trigger="revealed" hx-swap="afterend" hx-get="/search/search-results?$!{qUrl}&p=$nextpage">
+                        #else
                 <li>
+                        #end
+                    #else
+                <li>
+                    #end
                     <a class="search-title" href="$result.uri">$result.title</a>
                     <a class="url" href="$result.uri">http://$result.url</a>
                     #foreach($highlight in $result.highlights)
@@ -91,50 +100,12 @@
                         <div class="resultsNum"><b>${result.highlights.size()} match(es)</b> in document</div>
                         <!-- <div class="resultsMod">modified: $result.modified</div> -->
                     </div>
-
-                    #set($i =$math.add($i, 1))
                     #if($i==$show)
                         #break
                     #end
                 </li>
                 #end
             </ul>
-
-            #if ($numberOfPages > 1)
-                <div class="pagination-wrap">
-                    <nav aria-label="Page navigation">
-            
-
-                        #set($paginationUrl = "")
-                        #foreach($url in $urlList)
-                            #set($paginationUrl = "$!{paginationUrl}&$!{url}")
-                        #end
-
-                        <ul class="pagination">
-
-                            #set($prev = $page - 1)
-                            #if ($prev >= 0)
-                                <li class="page-item"><a class="page-link" href="?$!{qUrl}$!{paginationUrl}&p=$prev">«</a></li>
-                            #else
-                                <li class="page-item disabled"><a class="page-link" href="#">«</a></li>
-                            #end
-
-                            #foreach ($i in [0..$numberOfPages])
-                                #if ($math.add($i,1) <= $numberOfPages)
-                                <li class="page-item #if ($page == $i)active#end"><a class="page-link" href="?$!{qUrl}$!{paginationUrl}&p=$!{i}">$math.add($i,1)</a></li>
-                                #end
-                            #end
-
-                            #set($next = $math.add($page,1))
-                            #if ($next < $numberOfPages)
-                                <li class="page-item"><a class="page-link" href="?$!{qUrl}$!{paginationUrl}&p=$next">»</a></li>
-                            #else
-                                <li class="page-item disabled"><a class="page-link" href="#">»</a></li>
-                            #end
-                        </ul>
-                    </nav>
-                </div>
-            #end
         </div>
     </div>
 #end
