@@ -144,41 +144,97 @@ Just to simplify the VTL for this example, remove the three blocks of code relat
 The result is [/2-remove-search-aggregations/site-search.vtl](https://github.com/yolabingo/dotcms-htmx/blob/2-remove-search-aggregations/site-search.vtl)
 
 ## Create /search/results "partial" Page
-We'll need to create a new "Page" on the site that returns "html over the wire" containing only the results of search queries. 
+We'll need to create a new "Page" on the site that returns "html over the wire" containing only the results of search queries - it must not include our header or footer files for "normal" HTML Pages.
 
-First, copy the current `site-search.vtl` code into a new Container. 
+### Create search-results Container
+First, create a new Container.
 
-Go to `Site -> Containers -> Add Container -> 
+Go to `Site -> Containers -> "+" -> Add Container -> 
 ```
 Title: search-results-htmx
-Code: paste in the `site-search.vtl` code
+Code: paste in the site-search.vtl code
 ```
-This code must now be refactored - it won't generate the search form any more. It returns only the HTML for search results - basically a `<ul>` with an  `<li>` for each result.
-click "Save and Publish"
+However this code must now be refactored - it need not generate the search form any more. It returns only the HTML for search results - basically a `<ul>` with an  `<li>` for each result. 
 
+Paste [this refactored version of our VTL](https://github.com/yolabingo/dotcms-htmx/blob/3-split-search-form-and-results/search-results-htmx.vtl) in the `Code` section.
+
+Once complete, click "Save and Publish"
+
+### Create search-results Template
 Next, make a new Template that includes only this container. In the backend
 
 `Site -> Templates -> right-click "Blank" -> Copy -> double-click the copied "Blank - 1" -> EDIT` 
 
-Set `Title: search-results-html` and Save.
+Set 
+```
+Title: search-results-htmx` 
+Description: htmx "html-over-the-wire" search results
+```
+and Save.
 
-Then `Add a Container -> search-results-htmx - demo.dotcms.com` and Save.  
+Then `Add a Container -> search-results-htmx - demo.dotcms.com` and Save.
 
-Then go back to 
+Go back to Templates list:
 
-`Site -> click Templates -> right-click "search-results-html" -> Publish`
+`Site -> click Templates -> right-click "search-results-htmx" -> Publish`
 
+### Create search-results Page
 Finally, create new Page using this Template.
 
 `Site -> Browser -> click "search" -> click "+" -> Page -> "type of Page = "Page" -> Select` and set:
 ```
 Host of Folder: search
 Title: search-results
-Template: search-results-html (demo.dotcms.com)
+Template: search-results-htmx (demo.dotcms.com)
 ```
 click "Publish"
 
+### Test search-results Page
+Try a couple tests
 
+[http://localhost:8080/search/search-results?q=ski](http://localhost:8080/search/search-results?q=ski)
+
+[http://localhost:8080/search/search-results?q=ski&p=2](http://localhost:8080/search/search-results?q=ski&p=2)
+
+Looks good! There is some pagination cruft to clean up but the functionality is there.
+
+### Final version of /search/search-results page
+[This final version of search-results-htmx.vtl](https://github.com/yolabingo/dotcms-htmx/blob/main/search-results-htmx.vtl) adds some finishing touches. Copy this VTL and replace the code in
+
+`Site -> Containers -> double-click search-results-htmx -> Code -> Save and Publish` 
+
+## Refactor pagination logic to use htmx "Infinite Scroll"
+[htmx Infinte Scroll docs](https://htmx.org/examples/infinite-scroll/)
+
+We can use the underlying pagination logic in the VTL with htmx infinte scroll. 
+
+When last `<li>` in the search results is visible on the screen, htmx will fetch 10 more results and append them to the `<ul>`.
+
+This is achieved by adding htmx attributes to the final `<li>` on each page
+```html
+<li hx-get="/search/search-results?q=ski&p=1"
+    hx-trigger="revealed"
+    hx-swap="afterend">
+```
 ## Refactor /search/ form to us htmx Active Search
+[htmx Active Search docs](https://htmx.org/examples/active-search/)
 
-## Refactor Pagination to use htmx Infinite Scroll
+Last step! Let's go back to
+
+`Site -> Browser -> application -> vtl -> site-search -> site-search.vtl`
+
+Replace the file contents with [this final version of site-search.vtl](https://github.com/yolabingo/dotcms-htmx/blob/main/site-search.vtl)
+
+All that needs remain of the original code is the search form and associated markup. Then add htmx attributes and disable the default submit behavior. A stripped-down version demonstrating the htmx elemets is:
+```html
+<form action="javascript:void(0);">
+    <input  name="q"
+            type="text"
+            hx-get="/search/search-results"
+            hx-target="#search-results-htmx"
+            hx-indicator=".htmx-indicator"
+            hx-trigger="keyup changed delay:500ms, search">
+</form>
+<span class="htmx-indicator"><img src="/application/themes/travel/images/spinner.gif"/> Searching...</span>
+<span id="search-results-htmx"></span>
+```
