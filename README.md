@@ -176,14 +176,14 @@ and Save.
 
 Then `Add a Container -> search-results-htmx - demo.dotcms.com` and Save.
 
-Go back to Templates list:
+Go back to Templates list to Publish the Template:
 
 `Site -> click Templates -> right-click "search-results-htmx" -> Publish`
 
 ### Create search-results Page
-Finally, create new Page using this Template.
+Create a new Page using this Template.
 
-`Site -> Browser -> click "search" -> click "+" -> Page -> "type of Page = "Page" -> Select` and set:
+`Site -> Browser -> click on the "search" folder -> click "+" -> Page -> "type of Page = "Page" -> Select` and set:
 ```
 Host of Folder: search
 Title: search-results
@@ -214,7 +214,7 @@ When last `<li>` in the search results is visible on the screen, htmx will fetch
 
 This is achieved by adding htmx attributes to the final `<li>` on each page
 ```html
-<li hx-get="/search/search-results?q=ski&p=1"
+<li hx-get="/search/search-results?q=ski&p=[next_page]"
     hx-trigger="revealed"
     hx-swap="afterend">
 ```
@@ -240,3 +240,12 @@ All that needs remain of the original code is the search form and associated mar
 <span class="htmx-indicator"><img src="/application/themes/travel/images/spinner.gif"/> Searching...</span>
 <span id="search-results-htmx"></span>
 ```
+
+Go to [http://localhost:8080/search/](http://localhost:8080/search/) and try a few searches. For searches with more than 10 results like 
+```
+store
+ski
+blog
+```
+scroll down to see the infinite scroll behavior.
+
