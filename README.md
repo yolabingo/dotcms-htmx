@@ -151,7 +151,7 @@ We'll need to create a new "Page" on the site that returns "html over the wire" 
 ### Create search-results Container
 First, create a new Container.
 
-Go to `Site -> Containers -> "+" -> Add Container -> 
+Go to `Site -> Containers -> "+" -> Add Container ->`
 ```
 Title: search-results-htmx
 Code: paste in the site-search.vtl code
@@ -160,7 +160,7 @@ However this code must now be refactored - it need not generate the search form 
 
 Paste [this refactored version of our VTL](https://github.com/yolabingo/dotcms-htmx/blob/3-split-search-form-and-results/search-results-htmx.vtl) in the `Code` section.
 
-Once complete, click "Save and Publish"
+then click "Save and Publish"
 
 ### Create search-results Template
 Next, make a new Template that includes only this container. In the back-end
