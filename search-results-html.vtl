@@ -67,7 +67,11 @@
 #end
 
 #if($page == 0)
-    <p class="results-info">We found <b>$totalsearchresults.results.size()</b> results in your search</p>
+    #if($totalsearchresults.results.size() > 0)
+        <p class="results-info">We found <b>$totalsearchresults.results.size()</b> results in your search</p>
+    #else
+        <p class="results-info">No results found</p>
+    #end
 #end
 #if($pagedsearchresults.results.size() > 0)
     #if($page == 0)
@@ -106,6 +110,9 @@
                 </li>
                 #end
             </ul>
+            <span class="htmx-indicator"> 
+                <img src="/dA/55998752-b1a0-42bc-aced-96c0aaaff877"/> Searching... 
+            </span> 
         </div>
     </div>
 #end
