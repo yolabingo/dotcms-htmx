@@ -80,20 +80,20 @@
             <ul class="search-results">
     #end
                 #set($i =0)
+                #set($nextpage = $math.add($page,1))
+                #set($htmxgetnextpage = "")
+                #set($Q = '"')
+                #if ($nextpage < $numberOfPages)
+                    ##HTMX - FETCH NEXT PAGE IF THERE IS ONE
+                    #set($htmxscrollattr = ' hx-trigger="revealed" hx-swap="afterend" hx-get="/search/search-results')
+                    #set($htmxscrollquerystring = "?${qUrl}&p=${nextpage}")
+                    #set($htmxgetnextpage = "$htmxscrollattr$htmxscrollquerystring$Q")
+                #end
                 #foreach($result in $pagedsearchresults.results)
                 ##PRINTING EACH SEARCH RESULT
                     #set($i =$math.add($i, 1))
-                    #if($i==$show)
-                        #set($nextpage = $math.add($page,1))
-                        #if ($nextpage < $numberOfPages)
-                          ##HTMX - FETCH NEXT PAGE IF THERE IS ONE
-                <li hx-trigger="revealed" hx-swap="afterend" hx-get="/search/search-results?$!{qUrl}&p=$nextpage">
-                        #else
-                <li>
-                        #end
-                    #else
-                <li>
-                    #end
+                    <li${htmxgetnextpage}>
+                    #set($htmxgetnextpage = "")
                     <a class="search-title" href="$result.uri">$result.title</a>
                     <a class="url" href="$result.uri">http://$result.url</a>
                     #foreach($highlight in $result.highlights)
@@ -109,10 +109,12 @@
                     #end
                 </li>
                 #end
-            </ul>
-            <span class="htmx-indicator"> 
-                <img src="/dA/55998752-b1a0-42bc-aced-96c0aaaff877"/> Searching... 
-            </span> 
+                <span class="htmx-indicator"> 
+                    <img src="/application/themes/travel/images/spinner.gif"/> Searching... 
+                </span>
+    #if($page == 0)
+            </ul>        
         </div>
     </div>
+    #end
 #end
