@@ -1,5 +1,5 @@
 # dotcms-htmx
-A detailed tutorial to integrate htmx into DotCMS demo site's search page.
+A tutorial to integrate htmx into DotCMS demo site's search page.
 
 ## Overview
 DotCMS, in addition to its extensive APIs and headless features, is also a great platform to manage rich websites with server-generated HTML pages.
