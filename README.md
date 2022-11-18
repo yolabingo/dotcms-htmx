@@ -24,7 +24,7 @@ dotCMS provides a Demo site to allow you to test and explore dotCMS features.
 > Below are a summarized set of steps, but you can also follow the instructions on our [Quick-Start Guide](/docs/latest/quick-start-guide).
 
 - Install and run [Docker Desktop](https://www.docker.com/products/docker-desktop).
-- In **Docker Desktop -> Preferences -> Resources -> Advanced**, you may wish to increase the allocated memory to improve performance. Generally **6 GB** is considered a good all-purpose amount of headroom, but depending on implementation and needs, you may be able to run comfortably on 4 or fewer.
+- In **Docker Desktop -> Preferences -> Resources -> Advanced**, you may wish to increase the allocated memory to improve performance. Generally, **4 GB** is a good "medium" level of headroom for current versions. However, depending on your needs and implementation, you may be able to run comfortably on less memory; likewise, heavier use may call for more.
 
 To run the dotCMS demo site locally, use the `single-node-demo-site` from our [Docker Compose examples](https://github.com/dotCMS/core/tree/master/docker/docker-compose-examples):
 
