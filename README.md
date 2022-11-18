@@ -4,7 +4,7 @@ A tutorial to integrate htmx into DotCMS demo site's search page.
 ## Overview
 DotCMS, in addition to its extensive APIs and headless features, is also a great platform to manage rich websites with server-generated HTML pages.
 
-Htmx is a library that allows you to access modern browser features directly from HTML, rather than using javascript.
+Htmx is a library that exposes modern browser features via HTML attributes, rather than using javascript.
 
 Combining dotCMS and htmx allows web developers to incorporate responsive, ajax-style elements and features to server-generated HTML pages without 
 
